@@ -3,38 +3,29 @@ import { Link } from 'react-router-dom';
 import PageDefault from '../../../components/PageDefault';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
+import useForm from '../../../hooks/useForm';
+import BACKEND_URL from '../../../config/index';
 
 function CadastroCategoria() {
+
   const valoresIniciais = {
     nome: '',
     descricao: '',
     color: '#000',
   };
-  const [valores, setValores] = useState(valoresIniciais);
+
+  const { handleChange, valores, clearForm } = useForm(valoresIniciais);
+
   const [categorias, setCategorias] = useState([]);
 
-  function setValor(chave, valor) {
-    console.log(chave, valor);
-    setValores({
-      ...valores,
-      [chave]: valor,
-    });
-  }
-
-  function handleChange(event) {
-    setValor(event.target.getAttribute('name'), event.target.value);
-  }
-
   useEffect(() => {
+    const CATEGORIAS_API = `${BACKEND_URL}/categorias`;
 
-    const BACKEND_URL = 'http://localhost:8080/categorias';
-
-    fetch(BACKEND_URL)
+    fetch(CATEGORIAS_API)
       .then(async (response) => {
         const parsed = await response.json();
         setCategorias([...parsed]);
       });
-
   }, []);
 
   return (
@@ -46,15 +37,15 @@ function CadastroCategoria() {
       <form onSubmit={(e) => {
         e.preventDefault();
         setCategorias([...categorias, valores]);
-        setValores(valoresIniciais);
+        clearForm();
       }}
       >
 
         <FormField
           label="Nome da categoria"
           type="text"
-          name="nome"
-          value={valores.nome}
+          name="titulo"
+          value={valores.titulo}
           onChange={handleChange}
         />
 
@@ -84,9 +75,9 @@ function CadastroCategoria() {
         </div>
         )}
         <ul>
-          {categorias.map((categoria, index) => (
-            <li key={`${index}-${categoria.nome}`}>
-              {categoria.nome}
+          {categorias.map((categoria) => (
+            <li key={`${categoria.id}`}>
+              {categoria.titulo}
             </li>
           ))}
         </ul>
